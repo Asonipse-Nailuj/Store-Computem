@@ -8,26 +8,35 @@ if (empty($_SESSION["user"])) {
 include_once "conexion.php";
 include_once "funciones.php";
 
+$user = $_SESSION["user"];
+
 if (isset($_POST["actualizar"])) {
-  if (!empty($_POST["usuario"]) && !empty($_POST["nombre"]) && !empty($_POST["password"]) && !empty($_POST["email"]) && !empty($_POST["tipo"])) {
-    $usuario = $_POST["usuario"];
+  if (!empty($_POST["usuario"]) && !empty($_POST["nombre"]) && !empty($_POST["password"]) && !empty($_POST["email"])) {
     $nombre = $_POST["nombre"];
     $password = $_POST["password"];
-    $tipo = $_POST["tipo"];
     $email = $_POST["email"];
 
-    $password = encrypt($password, $usuario);
+    $password = encrypt($password, $user);
 
-    $sentencia = $conexion->prepare("INSERT INTO usuario VALUES(?, ?, ?, ?, ?, ?);");
-    $sentencia->execute([$usuario, $password, "s", $nombre, $email, $tipo]);
+    $sentencia = $conexion->prepare("UPDATE usuario SET password = ?, nombre = ?, correo = ? WHERE user = ?;");
+    $sentencia->execute([$password, $nombre, $email, $_SESSION["user"]]);
 
-    permisos_tmp($usuario, $tipo, $conexion);
-
-    $registrado = true;
+    $actualizado = true;
   }
 } else {
-    
+
+  $registro = $conexion->prepare("SELECT * FROM usuario WHERE user = :usuario") or die($conexion->error);
+  $registro->execute(["usuario" => $user]);
+
+  while ($row = $registro->fetch()) {
+    $password = $row["password"];
+    $nombre = $row["nombre"];
+    $email = $row["correo"];
+  }
+
 }
+
+$password = decrypt($password, $user);
 ?>
 
 <!DOCTYPE html>
@@ -178,11 +187,11 @@ if (isset($_POST["actualizar"])) {
 
           <div class="row">
             <?php
-            if (!empty($registrado)) {
-              echo '<div class="alert alert-success alert-dismissible " role="alert">
+            if (!empty($actualizado)) {
+              echo '<div class="alert alert-info alert-dismissible " role="alert">
                       <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
                       </button>
-                      <strong>TODO CORRECTO!</strong> El usuario ha sido registrado en el sistema.
+                      <strong>INFORMACION ACTUALIZADA!</strong> Los datos han sido modificados en el sistema.
                     </div>';
             }
             ?>
@@ -199,14 +208,14 @@ if (isset($_POST["actualizar"])) {
                     <div class="field item form-group">
                       <label class="col-form-label col-md-3 col-sm-3  label-align">Nombre de Usuario<span class="required">*</span></label>
                       <div class="col-md-6 col-sm-6">
-                        <input class="form-control" data-validate-length-range="6" data-validate-words="1" name="usuario" required="required" readonly />
+                        <input class="form-control" value="<?php echo $user; ?>" data-validate-length-range="6" data-validate-words="1" name="usuario" required="required" readonly />
                       </div>
                     </div>
 
                     <div class="field item form-group">
                       <label class="col-form-label col-md-3 col-sm-3  label-align">Contraseña<span class="required">*</span></label>
                       <div class="col-md-6 col-sm-6">
-                        <input class="form-control" type="password" id="password1" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}" title="Minimo 8 Caracteres Incluyendo una mayuscula y una minuscula, ademas de un numero y un simbolo" required />
+                        <input class="form-control" value="<?php echo $password; ?>" type="password" id="password1" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}" title="Minimo 8 Caracteres Incluyendo una mayuscula y una minuscula, ademas de un numero y un simbolo" required />
 
                         <span style="position: absolute;right:15px;top:7px;" onclick="hideshow()">
                           <i id="slash" class="fa fa-eye-slash"></i>
@@ -224,22 +233,21 @@ if (isset($_POST["actualizar"])) {
                     <div class="field item form-group">
                       <label class="col-form-label col-md-3 col-sm-3  label-align">Nombre Completo<span class="required">*</span></label>
                       <div class="col-md-6 col-sm-6">
-                        <input class="form-control" data-validate-length-range="6" data-validate-words="2" name="nombre" required="required" />
+                        <input class="form-control" value="<?php echo $nombre; ?>" data-validate-length-range="6" data-validate-words="2" name="nombre" required="required" />
                       </div>
                     </div>
 
                     <div class="field item form-group">
                       <label class="col-form-label col-md-3 col-sm-3  label-align">Correo Electronico<span class="required">*</span></label>
                       <div class="col-md-6 col-sm-6">
-                        <input class="form-control" name="email" class='email' required="required" type="email" /></div>
+                        <input class="form-control" value="<?php echo $email; ?>" name="email" class='email' required="required" type="email" /></div>
                     </div>
 
                     <div class="ln_solid">
                       <div class="form-group">
                         <br>
                         <div class="col-md-6 offset-md-3">
-                          <button type='reset' class="btn btn-primary">Limpiar</button>
-                          <button type='submit' class="btn btn-success" name="actualizar">Actualizar</button>
+                          <button type='submit' class="btn btn-info" name="actualizar">Actualizar</button>
                         </div>
                       </div>
                     </div>
