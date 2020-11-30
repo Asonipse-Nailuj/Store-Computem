@@ -101,7 +101,7 @@ include_once("conexion.php");
                 $usuario = $_POST["insert_user"];
                 $nombre = $_POST["insert_nombre"];
                 $password = $_POST["insert_pass"];
-                $email = $_POST["email"];
+                $email = $_POST["insert_email"];
                 $tipo = "vendedor";
 
                 $password = encrypt($password, $usuario);

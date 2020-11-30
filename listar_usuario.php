@@ -335,6 +335,9 @@ if (isset($_POST["editar"])) {
   <script src="vendors/pdfmake/build/pdfmake.min.js"></script>
   <script src="vendors/pdfmake/build/vfs_fonts.js"></script>
 
+  <script src="vendors/validator/multifield.js"></script>
+  <script src="vendors/validator/validator.js"></script>
+
   <!-- Custom Theme Scripts -->
   <script src="build/js/custom.min.js"></script>
 
