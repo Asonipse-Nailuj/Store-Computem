@@ -15,8 +15,6 @@ if (!permiso($_SESSION["user"], "1", $conexion)) {
 date_default_timezone_set('America/Bogota');
 $fechaActual = date('d / m / Y');
 
-// $registros = $conexion->query("SELECT nombre FROM usuario") or die($conexion->error);
-// $usuarios = $registros->fetchAll(PDO::FETCH_OBJ);
 ?>
 
 <!DOCTYPE html>
@@ -205,7 +203,7 @@ $fechaActual = date('d / m / Y');
                       <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
                     </div>
 
-                    <div class="col-md-12 col-sm-12 orm-group has-feedback">
+                    <div class="col-md-12 col-sm-12 form-group has-feedback">
                       <h3>Fecha</h3>
                       <span>(dia / mes / año)</span>
                     </div>
@@ -214,7 +212,6 @@ $fechaActual = date('d / m / Y');
                       <span class="fa fa-calendar form-control-feedback left" aria-hidden="true"></span>
                       <br>
                     </div>
-
                   </form>
                 </div>
               </div>
@@ -250,12 +247,12 @@ $fechaActual = date('d / m / Y');
 
                   <tbody>
                     <tr class="even pointer">
-                      <td class=" "><input type="text"></td>
-                      <td class=" "></td>
-                      <td class=" "></td>
-                      <td class=" "></td>
-                      <td class=" "></td>
-                      <td class=" last"><button class="btn btn-success">Agregar</button>
+                      <td><input type="text" id="cod_producto" placeholder="Codigo Producto"></td>
+                      <td id="nombre_producto"></td>
+                      <td id="precio_producto"></td>
+                      <td id="cantidad_producto"></td>
+                      <td id="subtotal"></td>
+                      <td class="last"><button type="button" id="agregar_producto" class="btn btn-success">Agregar</button>
                       </td>
                     </tr>
                   </tbody>
@@ -281,28 +278,51 @@ $fechaActual = date('d / m / Y');
                   <thead>
                     <tr class="headings">
                       <th class="column-title">Id Producto </th>
-                      <th class="column-title">Nombre </th>
+                      <td class="column-title">Nombre </th>
                       <th class="column-title">Precio </th>
                       <th class="column-title">Cantidad </th>
                       <th class="column-title">Subtotal </th>
                     </tr>
                   </thead>
 
-                  <tbody>
+                  <tbody id="lista_productos">
                   </tbody>
-
-                  <tfoot>
-
-                  </tfoot>
                 </table>
               </div>
             </div>
           </div>
         </div>
+
+        <div class="col-md-8 col-sm-8"></div>
+        <div class="col-md-4 col-sm-4  pull-right">
+          <div class="x_panel">
+            <div class="x_content">
+              <table class="table">
+                <thead>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="badge badge-dark">SUBTOTAL</td>
+                    <td id="lista_subtotal" class="text-right">00.00</td>
+                  </tr>
+                  <tr>
+                    <td class="badge badge-warning">IVA (16%)</td>
+                    <td id="lista_iva" class="text-right">00.00</td>
+                  </tr>
+                  <tr>
+                    <td class="badge badge-info">PRECIO TOTAL</td>
+                    <td id="lista_total" class="text-right">00.00</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td><button class="btn btn-secondary" id="generar_factura">Generar Factura</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-
-
-
 
       <!-- footer content -->
       <footer>
@@ -351,6 +371,8 @@ $fechaActual = date('d / m / Y');
   <script src="vendors/starrr/dist/starrr.js"></script>
   <!-- Custom Theme Scripts -->
   <script src="build/js/custom.min.js"></script>
+
+  <script src="js/factura.js"></script>
 
 </body>
 

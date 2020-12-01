@@ -14,7 +14,7 @@ if (!permiso($_SESSION["user"], "3", $conexion)) {
 
 if (isset($_POST["registrar"])) {
   if (!empty($_POST["documento"]) && !empty($_POST["nombre"]) && !empty($_POST["apellido"]) && !empty($_POST["direccion"]) && !empty($_POST["telefono"])) {
-    $sentencia = $conexion->prepare("INSERT INTO cliente VALUES(?, ?, ?, ?, ?)");
+    $sentencia = $conexion->prepare("INSERT INTO cliente VALUES(?, ?, ?, ?, ?, ?)");
     $sentencia->execute([$_POST["documento"], $_POST["nombre"], $_POST["apellido"], $_POST["direccion"], $_POST["telefono"], "s"]);
 
     $registrado = true;
