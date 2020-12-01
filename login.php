@@ -59,8 +59,8 @@ include_once("conexion.php");
 
               foreach ($cuenta as $row) {
                 $nombre = $row->nombre;
-                $nombre = explode(" ", $nombre);
-                $nombre = $nombre[0];
+                //$nombre = explode(" ", $nombre);
+                //$nombre = $nombre[0];
 
                 $tipo = $row->tipo;
 

@@ -11,6 +11,12 @@ include_once "funciones.php";
 if (!permiso($_SESSION["user"], "1", $conexion)) {
   header("Location: acceso_negado.php");
 }
+
+date_default_timezone_set('America/Bogota');
+$fechaActual = date('d / m / Y');
+
+// $registros = $conexion->query("SELECT nombre FROM usuario") or die($conexion->error);
+// $usuarios = $registros->fetchAll(PDO::FETCH_OBJ);
 ?>
 
 <!DOCTYPE html>
@@ -171,8 +177,10 @@ if (!permiso($_SESSION["user"], "1", $conexion)) {
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                  <br />
                   <form class="form-label-left input_mask">
+                    <div class="col-md-12 col-sm-12 orm-group has-feedback">
+                      <h3>Cliente</h3>
+                    </div>
 
                     <div class="col-md-6 col-sm-6  form-group has-feedback">
                       <input type="text" class="form-control has-feedback-left" id="documento" placeholder="Documento">
@@ -184,18 +192,25 @@ if (!permiso($_SESSION["user"], "1", $conexion)) {
                       <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
                     </div>
 
+                    <div class="col-md-12 col-sm-12 orm-group has-feedback">
+                      <h3>Vendedor</h3>
+                    </div>
                     <div class="col-md-6 col-sm-6  form-group has-feedback">
-                      <input type="email" class="form-control has-feedback-left" id="usuario" placeholder="Usuario" readonly>
+                      <input type="email" class="form-control has-feedback-left" id="usuario" placeholder="Usuario" value="<?php echo $_SESSION['user']; ?>" readonly>
                       <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
                     </div>
 
                     <div class="col-md-6 col-sm-6  form-group has-feedback">
-                      <input type="tel" class="form-control" id="nombre_vendedor" placeholder="Nombre Vendedor" readonly>
+                      <input type="tel" class="form-control" id="nombre_vendedor" placeholder="Nombre Vendedor" value="<?php echo $_SESSION['user_name']; ?>" readonly>
                       <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
                     </div>
 
+                    <div class="col-md-12 col-sm-12 orm-group has-feedback">
+                      <h3>Fecha</h3>
+                      <span>(dia / mes / año)</span>
+                    </div>
                     <div class="col-md-6 col-sm-6  form-group has-feedback">
-                      <input type="text" class="form-control has-feedback-left" id="fecha" placeholder="Fecha" readonly>
+                      <input type="text" class="form-control has-feedback-left" id="fecha" placeholder="Fecha" value="<?php echo $fechaActual; ?>" readonly>
                       <span class="fa fa-calendar form-control-feedback left" aria-hidden="true"></span>
                       <br>
                     </div>
@@ -229,7 +244,7 @@ if (!permiso($_SESSION["user"], "1", $conexion)) {
                       <th class="column-title">Cantidad </th>
                       <th class="column-title">Subtotal </th>
                       <th class="column-title"> </th>
-                      
+
                     </tr>
                   </thead>
 
@@ -277,7 +292,7 @@ if (!permiso($_SESSION["user"], "1", $conexion)) {
                   </tbody>
 
                   <tfoot>
-                    
+
                   </tfoot>
                 </table>
               </div>
@@ -302,40 +317,40 @@ if (!permiso($_SESSION["user"], "1", $conexion)) {
 
   <!-- jQuery -->
 
-  <script src="../vendors/jquery/dist/jquery.min.js"></script>
+  <script src="vendors/jquery/dist/jquery.min.js"></script>
   <!-- Bootstrap -->
-  <script src="../vendors/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="vendors/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <!-- FastClick -->
-  <script src="../vendors/fastclick/lib/fastclick.js"></script>
+  <script src="vendors/fastclick/lib/fastclick.js"></script>
   <!-- NProgress -->
-  <script src="../vendors/nprogress/nprogress.js"></script>
+  <script src="vendors/nprogress/nprogress.js"></script>
   <!-- bootstrap-progressbar -->
-  <script src="../vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+  <script src="vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
   <!-- iCheck -->
-  <script src="../vendors/iCheck/icheck.min.js"></script>
+  <script src="vendors/iCheck/icheck.min.js"></script>
   <!-- bootstrap-daterangepicker -->
-  <script src="../vendors/moment/min/moment.min.js"></script>
-  <script src="../vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+  <script src="vendors/moment/min/moment.min.js"></script>
+  <script src="vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
   <!-- bootstrap-wysiwyg -->
-  <script src="../vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
-  <script src="../vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
-  <script src="../vendors/google-code-prettify/src/prettify.js"></script>
+  <script src="vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
+  <script src="vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
+  <script src="vendors/google-code-prettify/src/prettify.js"></script>
   <!-- jQuery Tags Input -->
-  <script src="../vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
+  <script src="vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
   <!-- Switchery -->
-  <script src="../vendors/switchery/dist/switchery.min.js"></script>
+  <script src="vendors/switchery/dist/switchery.min.js"></script>
   <!-- Select2 -->
-  <script src="../vendors/select2/dist/js/select2.full.min.js"></script>
+  <script src="vendors/select2/dist/js/select2.full.min.js"></script>
   <!-- Parsley -->
-  <script src="../vendors/parsleyjs/dist/parsley.min.js"></script>
+  <script src="vendors/parsleyjs/dist/parsley.min.js"></script>
   <!-- Autosize -->
-  <script src="../vendors/autosize/dist/autosize.min.js"></script>
+  <script src="vendors/autosize/dist/autosize.min.js"></script>
   <!-- jQuery autocomplete -->
-  <script src="../vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
+  <script src="vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
   <!-- starrr -->
-  <script src="../vendors/starrr/dist/starrr.js"></script>
+  <script src="vendors/starrr/dist/starrr.js"></script>
   <!-- Custom Theme Scripts -->
-  <script src="../build/js/custom.min.js"></script>
+  <script src="build/js/custom.min.js"></script>
 
 </body>
 
