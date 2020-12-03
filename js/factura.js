@@ -212,7 +212,7 @@ function generarFactura() {
             data: datos,
             url: 'controller_factura.php',
             success: function (resultado) {
-                if (resultado != "") {
+                if (resultado.res == "true") {
                     $(location).attr('href', "facturacion.php?res=true");
                 } else {
                     $(location).attr('href', "facturacion.php?res=false");

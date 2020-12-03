@@ -97,10 +97,40 @@ if ($peticion == "cliente") {
     $doc_cliente = $_POST["doc_cliente"];
     $total = $_POST["total"];
 
-    $sentencia = $conexion->prepare("INSERT INTO item_venta (fecha, user_vendedor, doc_cliente, total) VALUES(CURRENT_TIMESTAMP, ?, ?, ?);");
+    $sentencia = $conexion->prepare("INSERT INTO item_venta (fecha, user_vendedor, doc_cliente, total, estado) VALUES(CURRENT_TIMESTAMP, ?, ?, ?, 's');");
     $sentencia->execute([$user_vendedor, $doc_cliente, $total]);
 
-    $respuesta = array("res" => "true");
+    $ultimaFactura = $conexion->prepare("SELECT MAX(id) as 'id' FROM item_venta");
+    $ultimaFactura->execute();
+    $registro = $ultimaFactura->fetchAll(PDO::FETCH_OBJ);
+
+    foreach ($registro as $cod) {
+        $factura = $cod->id;
+    }
+
+    $consulta = $conexion->prepare("SELECT * FROM detalle_tmp WHERE user = ?");
+    $consulta->execute([$user_vendedor]);
+
+    $num = $consulta->rowCount();
+    if ($num >= 1) {
+        $registros = $consulta->fetchAll(PDO::FETCH_OBJ);
+        foreach ($registros as $row) {
+            $producto = $row->producto;
+            $cantidad = $row->cantidad;
+            $precio = $row->precio;
+            $subtotal = $row->subtotal;
+
+            $sentencia = $conexion->prepare("INSERT INTO item_detalle_venta (producto, factura, cantidad, precio, subtotal) VALUES(?, ?, ?, ?, ?);");
+            $sentencia->execute([$producto, $factura, $cantidad, $precio, $subtotal]);
+        }
+
+        $sentencia = $conexion->prepare("DELETE FROM detalle_tmp WHERE user = ?;");
+        $sentencia->execute([$user_vendedor]);
+
+        $respuesta = array("res" => "true");
+    } else {
+        $respuesta = "";
+    }
 
     echo json_encode($respuesta);
 } else {
