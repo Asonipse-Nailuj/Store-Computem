@@ -5,6 +5,43 @@ function start() {
     $("#cod_producto").keyup(buscarProducto);
     $("#agregar_producto").click(agregarProducto);
     $("#generar_factura").click(generarFactura);
+
+    cargarTmps();
+}
+
+function cargarTmps() {
+    var datos = {
+        'user': $("#usuario").val(),
+        'peticion': 'cargarTmp'
+    };
+
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: datos,
+        url: 'controller_factura.php',
+        success: function (resultado) {
+            if (resultado != "") {
+                var lista = "";
+                for (let i = 0; i < resultado.length; i++) {
+
+                    lista += "<tr>";
+                    lista += "<td class='td_id'>" + resultado[i].producto + "</td>";
+                    lista += "<td class='td_nom'>" + resultado[i].nombre + "</td>";
+                    lista += "<td class='td_precio'>" + resultado[i].precio + "</td>";
+                    lista += "<td class='td_cant'>" + resultado[i].cantidad + "</td>";
+                    lista += "<td class='td_subtotal'>" + resultado[i].subtotal + "</td>";
+                    lista += "<td class='last'><button type='button' class='btn btn-danger quitar_producto'>Quitar</button></td>"
+                    lista += "</tr>";
+
+                    $("#lista_productos").html(lista);
+                    $(".quitar_producto").click(quitarProducto);
+
+                    calcularTotal();
+                }
+            }
+        }
+    });
 }
 
 function buscarCliente(e) {
@@ -86,25 +123,33 @@ function agregarProducto() {
         var cant = $("#cant_producto").val();
         var subtotal = $("#subtotal").text();
 
-        var datos = $("#lista_productos").html();
+        var datos = {
+            'producto': cod,
+            'user': $("#usuario").val(),
+            'nom': nom,
+            'cant': cant,
+            'precio': precio,
+            'subtotal': subtotal,
+            'peticion': 'agregarTmp'
+        };
 
-        datos += "<tr>";
-        datos += "<td class='td_id'>" + cod + "</td>";
-        datos += "<td class='td_nom'>" + nom + "</td>";
-        datos += "<td class='td_precio'>" + precio + "</td>";
-        datos += "<td class='td_cant'>" + cant + "</td>";
-        datos += "<td class='td_subtotal'>" + subtotal + "</td>";
-        datos += "</tr>";
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: datos,
+            url: 'controller_factura.php',
+            success: function (resultado) {
+                if (resultado.res == "true") {
+                    cargarTmps();
 
-        $("#lista_productos").html(datos);
-
-        $("#cod_producto").val("");
-        $("#nombre_producto").text("");
-        $("#precio_producto").text("");
-        $("#cantidad_producto").html("");
-        $("#subtotal").text("");
-
-        calcularTotal();
+                    $("#cod_producto").val("");
+                    $("#nombre_producto").text("");
+                    $("#precio_producto").text("");
+                    $("#cantidad_producto").html("");
+                    $("#subtotal").text("");
+                }
+            }
+        });
     }
 }
 
@@ -124,35 +169,31 @@ function calcularTotal() {
     $("#lista_total").text(total + ".00");
 }
 
+function quitarProducto() {
+    var fila = $(this).parents("tr");
+    var cod = $(this).parents("tr").find(".td_id").text();
+    
+    var datos = {
+        'producto': cod,
+        'user': $("#usuario").val(),
+        'peticion': 'quitarTmp'
+    };
+
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: datos,
+        url: 'controller_factura.php',
+        success: function (resultado) {
+            if (resultado.res == "true") {
+                fila.remove()
+            }
+        }
+    });
+}
+
 function generarFactura() {
     if (parseFloat($("#lista_total").text()) > 0) {
-        var cods = [];
-        $.each($(".td_id"), function (i, valor) {
-            var item = valor.innerHTML;
-
-            cods.push(item);
-        });
-
-        var pre = [];
-        $.each($(".td_precio"), function (i, valor) {
-            var item = parseFloat(valor.innerHTML);
-
-            pre.push(item);
-        });
-
-        var cants = [];
-        $.each($(".td_cant"), function (i, valor) {
-            var item = valor.innerHTML;
-
-            cants.push(item);
-        });
-
-        var subs = [];
-        $.each($(".td_subtotal"), function (i, valor) {
-            var item = parseFloat(valor.innerHTML);
-
-            subs.push(item);
-        });
 
         var vendedor = $("#usuario").val();
         var cliente = $("#documento").val();
@@ -162,10 +203,6 @@ function generarFactura() {
             'user_vendedor': vendedor,
             'doc_cliente': cliente,
             'total': total,
-            'cods_productos': cods,
-            'precios_productos': pre,
-            'cants_productos': cants,
-            'subs_productos': subs,
             'peticion': 'generarFactura'
         };
 
@@ -176,9 +213,9 @@ function generarFactura() {
             url: 'controller_factura.php',
             success: function (resultado) {
                 if (resultado != "") {
-                    $(location).attr('href',"facturacion.php?res=true");
+                    $(location).attr('href', "facturacion.php?res=true");
                 } else {
-                    $(location).attr('href',"facturacion.php?res=false");
+                    $(location).attr('href', "facturacion.php?res=false");
                 }
             }
         });

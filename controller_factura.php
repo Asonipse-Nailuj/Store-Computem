@@ -34,26 +34,73 @@ if ($peticion == "cliente") {
     }
 
     echo json_encode($producto);
+} elseif ($peticion == "cargarTmp") {
+    $user = $_POST['user'];
+
+    $consulta = $conexion->prepare("SELECT * FROM detalle_tmp WHERE user = :user") or die($conexion->error);
+    $consulta->bindParam(":user", $user);
+    $consulta->execute();
+
+    $num = $consulta->rowCount();
+    if ($num >= 1) {
+        while ($fila = $consulta->fetch()) {
+            $detalles[] = $fila;
+        }
+    } else {
+        $detalles = "";
+    }
+
+    echo json_encode($detalles);
+} elseif ($peticion == "quitarTmp") {
+    $producto = $_POST['producto'];
+    $user = $_POST['user'];
+
+    $consulta = $conexion->prepare("DELETE FROM detalle_tmp WHERE producto = ? AND user = ?;");
+    $consulta->execute([$producto, $user]);
+
+    $respuesta = array("res" => "true");
+
+    echo json_encode($respuesta);
+} elseif ($peticion == "agregarTmp") {
+    $producto = $_POST['producto'];
+    $user = $_POST['user'];
+    $nom = $_POST['nom'];
+    $cant = $_POST['cant'];
+    $precio = $_POST['precio'];
+    $subtotal = $_POST['subtotal'];
+
+    $consulta = $conexion->prepare("SELECT * FROM detalle_tmp WHERE producto = ?");
+    $consulta->execute([$producto]);
+
+    $num = $consulta->rowCount();
+
+    if ($num >= 1) {
+        $registro = $consulta->fetchAll(PDO::FETCH_OBJ);
+        foreach ($registro as $row) {
+            $cantidad = $row->cantidad;
+        }
+
+        $cant = $cant + $cantidad;
+
+        $sentencia = $conexion->prepare("UPDATE detalle_tmp SET cantidad = ? WHERE producto = ?;");
+        $sentencia->execute([$cant, $producto]);
+    } else {
+        $sentencia = $conexion->prepare("INSERT INTO detalle_tmp (producto, user, nombre, cantidad, precio, subtotal) VALUES(?, ?, ?, ?, ?, ?);");
+        $sentencia->execute([$producto, $user, $nom, $cant, $precio, $subtotal]);
+    }
+
+    $respuesta = array("res" => "true");
+
+    echo json_encode($respuesta);
 } elseif ($peticion == "generarFactura") {
     $user_vendedor = $_POST["user_vendedor"];
     $doc_cliente = $_POST["doc_cliente"];
     $total = $_POST["total"];
-    $cods_productos = array($_POST['cods_productos']);
-    $precios_productos = array($_POST['precios_productos']);
-    $cants_productos = array($_POST['cants_productos']);
-    $subs_productos = array($_POST['subs_productos']);
 
     $sentencia = $conexion->prepare("INSERT INTO item_venta (fecha, user_vendedor, doc_cliente, total) VALUES(CURRENT_TIMESTAMP, ?, ?, ?);");
     $sentencia->execute([$user_vendedor, $doc_cliente, $total]);
 
-    $num = count($cods_productos);
-
-    for ($i = 0; $i < $num; ++$i) {
-        $sentencia = $conexion->prepare("INSERT INTO item_detalle_venta (producto, cantidad, precio, subtotal) VALUES(?, ?, ?, ?);");
-        $sentencia->execute([$cods_productos[$i], $cants_productos[$i], $precios_productos[$i], $subs_productos[$i]]);
-    }
-
-    $respuesta = array("res"=>"true");
+    $respuesta = array("res" => "true");
 
     echo json_encode($respuesta);
 } else {

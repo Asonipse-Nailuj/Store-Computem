@@ -252,8 +252,7 @@ $fechaActual = date('d / m / Y');
                       <td id="precio_producto"></td>
                       <td id="cantidad_producto"></td>
                       <td id="subtotal"></td>
-                      <td class="last"><button type="button" id="agregar_producto" class="btn btn-success">Agregar</button>
-                      </td>
+                      <td class="last"><button type="button" id="agregar_producto" class="btn btn-success">Agregar</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -282,6 +281,7 @@ $fechaActual = date('d / m / Y');
                       <th class="column-title">Precio </th>
                       <th class="column-title">Cantidad </th>
                       <th class="column-title">Subtotal </th>
+                      <th class="column-title">Acciones </th>
                     </tr>
                   </thead>
 

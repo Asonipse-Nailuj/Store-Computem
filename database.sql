@@ -59,8 +59,22 @@ CREATE TABLE item_venta (
 );
 
 CREATE TABLE item_detalle_venta (
-    id INT UNSIGNED,
+    id INT UNSIGNED AUTO_INCREMENT,
     producto INT UNSIGNED,
+    factura INT UNSIGNED,
+    cantidad SMALLINT UNSIGNED,
+    precio FLOAT(10,2),
+    subtotal FLOAT(10,2),
+    PRIMARY KEY(id),
+    FOREIGN KEY(producto) REFERENCES inventario(id),
+    FOREIGN KEY(factura) REFERENCES item_venta(id)
+);
+
+CREATE TABLE detalle_tmp (
+    id INT UNSIGNED AUTO_INCREMENT,
+    producto INT UNSIGNED,
+    user VARCHAR(30),
+    nombre VARCHAR(50),
     cantidad SMALLINT UNSIGNED,
     precio FLOAT(10,2),
     subtotal FLOAT(10,2),
@@ -71,3 +85,14 @@ CREATE TABLE item_detalle_venta (
 INSERT INTO `permiso_tmp` (`nombre`) 
 VALUES ('Modulo facturacion'), ('Modulo inventario'), ('Modulo clientes'), ('Modulo usuarios'), ('Modulo reportes'), 
 ('Modulo permisos'), ('Modulo vendedor'), ('Modulo administrador');
+
+INSERT INTO usuario VALUES("julian", "fava4JqWnmtT", "s", "Julian Espinosa", "julian@mail.com", "admin");
+
+INSERT INTO permiso (permiso, user, estado) VALUES(1, "julian", "s");
+INSERT INTO permiso (permiso, user, estado) VALUES(2, "julian", "s");
+INSERT INTO permiso (permiso, user, estado) VALUES(3, "julian", "s");
+INSERT INTO permiso (permiso, user, estado) VALUES(4, "julian", "s");
+INSERT INTO permiso (permiso, user, estado) VALUES(5, "julian", "s");
+INSERT INTO permiso (permiso, user, estado) VALUES(6, "julian", "s");
+INSERT INTO permiso (permiso, user, estado) VALUES(7, "julian", "s");
+INSERT INTO permiso (permiso, user, estado) VALUES(8, "julian", "s");
