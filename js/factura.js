@@ -193,7 +193,7 @@ function quitarProducto() {
 }
 
 function generarFactura() {
-    if (parseFloat($("#lista_total").text()) > 0) {
+    if (parseFloat($("#lista_total").text()) > 0 && $("#documento").val() != "") {
 
         var vendedor = $("#usuario").val();
         var cliente = $("#documento").val();
@@ -219,5 +219,7 @@ function generarFactura() {
                 }
             }
         });
+    } else {
+        alert("Primero selecciona un cliente y agrega productos para generar la factura")
     }
 }

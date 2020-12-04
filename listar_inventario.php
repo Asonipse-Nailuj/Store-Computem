@@ -18,6 +18,15 @@ if (isset($_POST["editar"])) {
 
   $editado = true;
 }
+
+if (isset($_GET["estado"]) && isset($_GET["cod"])) {
+  $estado = ($_GET["estado"] == "s") ? "n" : "s";
+
+  $sentencia = $conexion->prepare("UPDATE inventario SET estado = ? WHERE id = ?;");
+  $sentencia->execute([$estado, $_GET["cod"]]);
+
+  $cambio_estado = true;
+}
 ?>
 
 <!DOCTYPE html>
@@ -176,6 +185,12 @@ if (isset($_POST["editar"])) {
                       </button>
                       <strong>DATOS ACTUALIZADOS!</strong> El producto ha sido actualizado en el sistema.
                     </div>';
+            } elseif (!empty($cambio_estado)) {
+              echo '<div class="alert alert-warning alert-dismissible " role="alert">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                      </button>
+                      <strong>ESTADO CAMBIADO!</strong> El estado del producto ha sido modificado en el sistema.
+                    </div>';
             }
             ?>
             <div class="col-md-12 col-sm-12 ">
@@ -198,6 +213,7 @@ if (isset($_POST["editar"])) {
                               <th>Descripción</th>
                               <th>Valor Unitario</th>
                               <th>Cantidad</th>
+                              <th>Estado</th>
                               <th>Acciones</th>
                             </tr>
                           </thead>
@@ -213,7 +229,18 @@ if (isset($_POST["editar"])) {
                               echo "<td>", $producto->descripcion, "</td>";
                               echo "<td>", $producto->valor_unitario, "</td>";
                               echo "<td>", $producto->cantidad, "</td>";
-                              echo "<td><button class='btn btn-info' data-toggle='modal' data-target='#editar_inventario", $producto->id, "'><i class='fa fa-edit'></i></button>  <button class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
+                              $estado = $producto->estado;
+                              if ($estado == "s") {
+                                $color = "danger";
+                                $icono = "fa-ban";
+                                echo "<td class='text-success'>Activo</td>";
+                              } else {
+                                $color = "success";
+                                $icono = "fa-check";
+                                echo "<td class='text-danger'>Inactivo</td>";
+                              }
+                              echo "<td><button class='btn btn-info' data-toggle='modal' data-target='#editar_inventario" . $producto->id . "'><i class='fa fa-edit'></i></button>  
+                              <a class='btn btn-" . $color . "' href='listar_inventario.php?estado=" . $estado . "&cod=" . $producto->id . "'><i class='fa " . $icono . "'></i></a></td>";
                               echo "</tr>";
                             ?>
                               <div class="modal fade" id="editar_inventario<?php echo $producto->id; ?>" tabindex="-1" role="dialog" aria-hidden="true">

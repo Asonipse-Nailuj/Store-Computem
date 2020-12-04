@@ -164,6 +164,17 @@ $fechaActual = date('d / m / Y');
           </div>
           <div class="clearfix"></div>
           <div class="row">
+          <?php
+              if (isset($_GET["res"])) {
+                if ($_GET["res"] == "true") {
+                    echo '<div class="alert alert-success alert-dismissible " role="alert">
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                              </button>
+                              <strong>TODO CORRECTO!</strong> La factura ha sido registrada en el sistema.
+                            </div>';
+                }
+              }
+            ?>
             <div class="col-md-12 ">
               <div class="x_panel">
                 <div class="x_title">

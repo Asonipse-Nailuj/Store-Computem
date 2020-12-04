@@ -20,7 +20,7 @@ if ($peticion == "cliente") {
 
     echo json_encode($cliente);
 } elseif ($peticion == "producto") {
-    $consulta = $conexion->prepare("SELECT * FROM inventario WHERE id = :cod") or die($conexion->error);
+    $consulta = $conexion->prepare("SELECT * FROM inventario WHERE id = :cod AND estado = 's'") or die($conexion->error);
     $consulta->bindParam(":cod", $_POST["cod_producto"]);
     $consulta->execute();
 
@@ -69,8 +69,8 @@ if ($peticion == "cliente") {
     $precio = $_POST['precio'];
     $subtotal = $_POST['subtotal'];
 
-    $consulta = $conexion->prepare("SELECT * FROM detalle_tmp WHERE producto = ?");
-    $consulta->execute([$producto]);
+    $consulta = $conexion->prepare("SELECT * FROM detalle_tmp WHERE producto = ? AND user = ?");
+    $consulta->execute([$producto, $user]);
 
     $num = $consulta->rowCount();
 
@@ -122,6 +122,9 @@ if ($peticion == "cliente") {
 
             $sentencia = $conexion->prepare("INSERT INTO item_detalle_venta (producto, factura, cantidad, precio, subtotal) VALUES(?, ?, ?, ?, ?);");
             $sentencia->execute([$producto, $factura, $cantidad, $precio, $subtotal]);
+
+            $sentencia = $conexion->prepare("UPDATE inventario SET cantidad = (cantidad - ?) WHERE id = ?;");
+            $sentencia->execute([$cantidad, $producto]);
         }
 
         $sentencia = $conexion->prepare("DELETE FROM detalle_tmp WHERE user = ?;");

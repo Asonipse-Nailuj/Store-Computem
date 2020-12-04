@@ -11,6 +11,15 @@ include_once "funciones.php";
 if (!permiso($_SESSION["user"], "5", $conexion)) {
   header("Location: acceso_negado.php");
 }
+
+if (isset($_GET["estado"]) && isset($_GET["cod"])) {
+  $estado = ($_GET["estado"] == "s") ? "n" : "s";
+
+  $sentencia = $conexion->prepare("UPDATE item_venta SET estado = ? WHERE id = ?;");
+  $sentencia->execute([$estado, $_GET["cod"]]);
+
+  $cambio_estado = true;
+}
 ?>
 
 <!DOCTYPE html>
@@ -132,8 +141,7 @@ if (!permiso($_SESSION["user"], "5", $conexion)) {
           <nav class="nav navbar-nav">
             <ul class=" navbar-right">
               <li class="nav-item dropdown open" style="padding-left: 15px;">
-                <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown"
-                  data-toggle="dropdown" aria-expanded="false">
+                <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
                   <img src="images/user.png" alt=""><?php echo $_SESSION["user"]; ?>
                 </a>
                 <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
@@ -157,12 +165,21 @@ if (!permiso($_SESSION["user"], "5", $conexion)) {
           <div class="clearfix"></div>
 
           <div class="row">
+            <?php
+            if (!empty($cambio_estado)) {
+              echo '<div class="alert alert-warning alert-dismissible " role="alert">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                      </button>
+                      <strong>ESTADO CAMBIADO!</strong> El estado de la factura ha sido modificado en el sistema.
+                    </div>';
+            }
+            ?>
             <div class="col-md-12 col-sm-12 ">
               <div class="x_panel">
                 <div class="x_title">
                   <h2>Listado de Ventas</h2>
                   <ul class="nav navbar-right panel_toolbox">
-                    
+
                   </ul>
                   <div class="clearfix"></div>
                 </div>
@@ -179,10 +196,92 @@ if (!permiso($_SESSION["user"], "5", $conexion)) {
                               <th>Documento Cliente</th>
                               <th>Total</th>
                               <th>Estado</th>
+                              <th>Acciones</th>
                             </tr>
                           </thead>
                           <tbody>
+                            <?php
+                            $registros = $conexion->query("SELECT * FROM item_venta") or die($conexion->error);
+                            $ventas = $registros->fetchAll(PDO::FETCH_OBJ);
 
+                            foreach ($ventas as $factura) {
+                              echo "<tr>";
+                              echo "<td>", $factura->id, "</td>";
+                              echo "<td>", $factura->fecha, "</td>";
+                              echo "<td>", $factura->user_vendedor, "</td>";
+                              echo "<td>", $factura->doc_cliente, "</td>";
+                              echo "<td>", $factura->total, "</td>";
+                              $estado = $factura->estado;
+                              if ($estado == "s") {
+                                $color = "danger";
+                                $icono = "fa-ban";
+                                echo "<td class='text-success'>Activo</td>";
+                              } else {
+                                $color = "success";
+                                $icono = "fa-check";
+                                echo "<td class='text-danger'>Inactivo</td>";
+                              }
+                              echo "<td><button class='btn btn-secondary' data-toggle='modal' data-target='#ver_productos" . $factura->id . "'><i class='fa fa-eye'></i></button> 
+                              <a class='btn btn-" . $color . "' href='reporte_ventas.php?estado=" . $estado . "&cod=" . $factura->id . "'><i class='fa " . $icono . "'></i></a></td>";
+                              echo "</tr>";
+                            ?>
+                              <div class="modal fade" id="ver_productos<?php echo $factura->id; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                  <div class="modal-content">
+
+                                    <div class="modal-header">
+                                      <h4 class="modal-title" id="myModalLabel2">Lista Productos</h4>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <div class="col-md-12 col-sm-12  ">
+                                        <div class="x_panel">
+                                          <div class="x_title">
+                                            <h2>Productos en factura <?php echo $factura->id; ?> <small>Cliente: <?php echo $factura->doc_cliente; ?></small></h2>
+                                            <div class="clearfix"></div>
+                                          </div>
+                                          <div class="x_content">
+                                            <ul class="list-unstyled timeline">
+                                              <?php
+                                              $consulta = $conexion->query("SELECT item_detalle_venta.*, inventario.nombre_producto, inventario.descripcion FROM item_detalle_venta JOIN inventario ON item_detalle_venta.producto = inventario.id WHERE factura = " . $factura->id) or die($conexion->error);
+                                              $productos = $consulta->fetchAll(PDO::FETCH_OBJ);
+
+                                              foreach ($productos as $row) {
+                                              ?>
+                                                <li>
+                                                  <div class="block">
+                                                    <div class="tags">
+                                                      <a class="tag">
+                                                        <span><?php echo $row->producto; ?></span>
+                                                      </a>
+                                                    </div>
+                                                    <div class="block_content">
+                                                      <h2 class="title">
+                                                        <a><?php echo $row->nombre_producto; ?></a>
+                                                      </h2>
+                                                      <div class="byline">
+                                                        <span><?php echo $factura->fecha; ?></a>
+                                                      </div>
+                                                      <p class="excerpt"><?php echo $row->descripcion; ?></p>
+                                                      <p class="excerpt">Cantidad: <?php echo $row->cantidad; ?></p>
+                                                      <p class="excerpt">Precio: $<?php echo $row->precio; ?></p>
+                                                      <p class="excerpt">Subtotal: $<?php echo $row->subtotal; ?></p>
+                                                    </div>
+                                                  </div>
+                                                </li>
+                                              <?php } ?>
+                                            </ul>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            <?php
+                            }
+                            ?>
                           </tbody>
                         </table>
                       </div>

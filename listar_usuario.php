@@ -19,6 +19,15 @@ if (isset($_POST["editar"])) {
 
   $editado = true;
 }
+
+if (isset($_GET["estado"]) && isset($_GET["user"])) {
+  $estado = ($_GET["estado"] == "s") ? "n" : "s";
+
+  $sentencia = $conexion->prepare("UPDATE usuario SET estado = ? WHERE user = ?;");
+  $sentencia->execute([$estado, $_GET["user"]]);
+
+  $cambio_estado = true;
+}
 ?>
 
 <!DOCTYPE html>
@@ -172,6 +181,12 @@ if (isset($_POST["editar"])) {
                       </button>
                       <strong>DATOS ACTUALIZADOS!</strong> El usuario ha sido actualizado en el sistema.
                     </div>';
+            } elseif (!empty($cambio_estado)) {
+              echo '<div class="alert alert-warning alert-dismissible " role="alert">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                      </button>
+                      <strong>ESTADO CAMBIADO!</strong> El estado del usuario ha sido modificado en el sistema.
+                    </div>';
             }
             ?>
             <div class="col-md-12 col-sm-12 ">
@@ -212,11 +227,16 @@ if (isset($_POST["editar"])) {
                               echo "<td>", $usuario->tipo, "</td>";
                               $estado = $usuario->estado;
                               if ($estado == "s") {
+                                $color = "danger";
+                                $icono = "fa-ban";
                                 echo "<td class='text-success'>Activo</td>";
                               } else {
+                                $color = "success";
+                                $icono = "fa-check";
                                 echo "<td class='text-danger'>Inactivo</td>";
                               }
-                              echo "<td><button class='btn btn-info' data-toggle='modal' data-target='#editar_usuario", $usuario->user, "'><i class='fa fa-edit'></i></button>  <button class='btn btn-danger'><i class='fa fa-trash'></i></buttons></td>";
+                              echo "<td><button class='btn btn-info' data-toggle='modal' data-target='#editar_usuario", $usuario->user, "'><i class='fa fa-edit'></i></button>  
+                              <a class='btn btn-" . $color . "' href='listar_usuario.php?estado=" . $estado . "&user=" . $usuario->user . "'><i class='fa " . $icono . "'></i></a></td>";
                               echo "</tr>";
                             ?>
                               <div class="modal fade" id="editar_usuario<?php echo $usuario->user; ?>" tabindex="-1" role="dialog" aria-hidden="true">

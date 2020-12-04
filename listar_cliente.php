@@ -13,10 +13,19 @@ if (!permiso($_SESSION["user"], "3", $conexion)) {
 }
 
 if (isset($_POST["editar"])) {
-  $sentencia = $conexion->prepare("UPDATE cliente SET nombre = ?, apellido = ?, direccion = ?, telefono = ?, estado = ? WHERE documento = ?;");
-  $sentencia->execute([$_POST["edit_nombre"], $_POST["edit_apellido"], $_POST["edit_direccion"], $_POST["edit_telefono"], $_POST["edit_estado"], $_POST["edit_documento"]]);
+  $sentencia = $conexion->prepare("UPDATE cliente SET nombre = ?, apellido = ?, direccion = ?, telefono = ? WHERE documento = ?;");
+  $sentencia->execute([$_POST["edit_nombre"], $_POST["edit_apellido"], $_POST["edit_direccion"], $_POST["edit_telefono"], $_POST["edit_documento"]]);
 
   $editado = true;
+}
+
+if (isset($_GET["estado"]) && isset($_GET["cod"])) {
+  $estado = ($_GET["estado"] == "s") ? "n" : "s";
+
+  $sentencia = $conexion->prepare("UPDATE cliente SET estado = ? WHERE documento = ?;");
+  $sentencia->execute([$estado, $_GET["cod"]]);
+
+  $cambio_estado = true;
 }
 ?>
 
@@ -176,6 +185,12 @@ if (isset($_POST["editar"])) {
                       </button>
                       <strong>DATOS ACTUALIZADOS!</strong> El cliente ha sido actualizado en el sistema.
                     </div>';
+            } elseif (!empty($cambio_estado)) {
+              echo '<div class="alert alert-warning alert-dismissible " role="alert">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                      </button>
+                      <strong>ESTADO CAMBIADO!</strong> El estado del cliente ha sido modificado en el sistema.
+                    </div>';
             }
             ?>
             <div class="col-md-12 col-sm-12 ">
@@ -216,11 +231,16 @@ if (isset($_POST["editar"])) {
                               echo "<td>", $cliente->telefono, "</td>";
                               $estado = $cliente->estado;
                               if ($estado == "s") {
+                                $color = "danger";
+                                $icono = "fa-ban";
                                 echo "<td class='text-success'>Activo</td>";
                               } else {
+                                $color = "success";
+                                $icono = "fa-check";
                                 echo "<td class='text-danger'>Inactivo</td>";
                               }
-                              echo "<td><button class='btn btn-info' data-toggle='modal' data-target='#editar_cliente", $cliente->documento, "'><i class='fa fa-edit'></i></button>  <button class='btn btn-danger'><i class='fa fa-trash'></i></button></td>";
+                              echo "<td><button class='btn btn-info' data-toggle='modal' data-target='#editar_cliente", $cliente->documento, "'><i class='fa fa-edit'></i></button>
+                              <a class='btn btn-" . $color . "' href='listar_cliente.php?estado=" . $estado . "&cod=" . $cliente->documento . "'><i class='fa " . $icono . "'></i></a></td>";
                               echo "</tr>";
                             ?>
                               <div class="modal fade" id="editar_cliente<?php echo $cliente->documento; ?>" tabindex="-1" role="dialog" aria-hidden="true">
@@ -252,18 +272,6 @@ if (isset($_POST["editar"])) {
                                         <br>
                                         <div>
                                           <input type="number" name="edit_telefono" class="form-control" placeholder="N° Telefono" value="<?php echo $cliente->telefono; ?>" required="" />
-                                        </div>
-                                        <br>
-                                        <label for="">Estado:</label>
-                                        <div class="radio">
-                                          <label>
-                                            <input type="radio" <?php if ($estado == "s") echo "checked"; ?> value="s" id="optionsRadios1" name="edit_estado"> Activo
-                                          </label>
-                                        </div>
-                                        <div class="radio">
-                                          <label>
-                                            <input type="radio" <?php if ($estado == "n") echo "checked"; ?> value="n" id="optionsRadios2" name="edit_estado"> Inactivo
-                                          </label>
                                         </div>
                                         <br>
                                         <div class="modal-footer">

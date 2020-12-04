@@ -14,7 +14,7 @@ if (!permiso($_SESSION["user"], "2", $conexion)) {
 
 if (isset($_POST["registrar"])) {
   if (!empty($_POST["nombre_producto"]) && !empty($_POST["descripcion"]) && !empty($_POST["valor_unitario"]) && !empty($_POST["cantidad"])) {
-    $sentencia = $conexion->prepare("INSERT INTO inventario (nombre_producto, descripcion, valor_unitario, cantidad) VALUES(?, ?, ?, ?)");
+    $sentencia = $conexion->prepare("INSERT INTO inventario (nombre_producto, descripcion, valor_unitario, cantidad, estado) VALUES(?, ?, ?, ?, 's')");
     $sentencia->execute([$_POST["nombre_producto"], $_POST["descripcion"], $_POST["valor_unitario"], $_POST["cantidad"]]);
 
     $registrado = true;
