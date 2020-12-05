@@ -5,7 +5,7 @@ $peticion = $_POST["peticion"];
 
 if ($peticion == "cliente") {
 
-    $consulta = $conexion->prepare("SELECT nombre, apellido FROM cliente WHERE documento = :doc") or die($conexion->error);
+    $consulta = $conexion->prepare("SELECT nombre, apellido, estado FROM cliente WHERE documento = :doc") or die($conexion->error);
     $consulta->bindParam(":doc", $_POST["doc_cliente"]);
     $consulta->execute();
 

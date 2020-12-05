@@ -44,13 +44,24 @@ function cargarTmps() {
     });
 }
 
-function buscarCliente(e) {
-    if (e.which == 13) {
+var estado_cliente;
 
-        $("#documento").attr("readonly", "true");
+function buscarCliente(e) {
+    if (e.which == 13 && $("#nombre_cliente").val() != "") {
+        if (estado_cliente == true) {
+            $("#documento").attr("readonly", "true");
+            $("#mensaje").html("");
+        } else {
+            var mensaje = '<div class="alert alert-warning alert-dismissible " role="alert">' +
+                            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>' +
+                            '</button>' +
+                            '<strong>EL CLIENTE ESTA INACTIVADO!</strong> El cliente ha sido inactivado en el sistema, comuniquese con un administrador para solucionar el problema.' +
+                          '</div>'
+
+            $("#mensaje").html(mensaje);
+        }
 
     } else {
-
         var doc = $("#documento").val();
 
         var datos = {
@@ -66,6 +77,12 @@ function buscarCliente(e) {
             success: function (resultado) {
                 if (resultado != "") {
                     $("#nombre_cliente").val(resultado[0].nombre + " " + resultado[0].apellido);
+
+                    if (resultado[0].estado == "s") {
+                        estado_cliente = true;
+                    } else {
+                        estado_cliente = false;
+                    }
                 } else {
                     $("#nombre_cliente").val("");
                 }
@@ -172,7 +189,7 @@ function calcularTotal() {
 function quitarProducto() {
     var fila = $(this).parents("tr");
     var cod = $(this).parents("tr").find(".td_id").text();
-    
+
     var datos = {
         'producto': cod,
         'user': $("#usuario").val(),
@@ -193,7 +210,7 @@ function quitarProducto() {
 }
 
 function generarFactura() {
-    if (parseFloat($("#lista_total").text()) > 0 && $("#documento").val() != "") {
+    if (parseFloat($("#lista_total").text()) > 0 && $("#documento").val() != "" && $("#documento").attr("readonly") == "readonly") {
 
         var vendedor = $("#usuario").val();
         var cliente = $("#documento").val();
@@ -220,6 +237,6 @@ function generarFactura() {
             }
         });
     } else {
-        alert("Primero selecciona un cliente y agrega productos para generar la factura")
+        alert("Primero selecciona y confirma un cliente, postetiormente agrega productos para generar la factura");
     }
 }

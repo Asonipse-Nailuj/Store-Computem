@@ -162,16 +162,23 @@ $fechaActual = date('d / m / Y');
           </div>
           <div class="clearfix"></div>
           <div class="row">
-          <?php
-              if (isset($_GET["res"])) {
-                if ($_GET["res"] == "true") {
-                    echo '<div class="alert alert-success alert-dismissible " role="alert">
-                              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
-                              </button>
-                              <strong>TODO CORRECTO!</strong> La factura ha sido registrada en el sistema.
-                            </div>';
-                }
+            <div id="mensaje"></div>
+            <?php
+            if (isset($_GET["res"])) {
+              if ($_GET["res"] == "true") {
+                echo '<div class="alert alert-success alert-dismissible " role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                        </button>
+                        <strong>TODO CORRECTO!</strong> La factura ha sido registrada en el sistema.
+                      </div>';
+              } else {
+                echo '<div class="alert alert-danger alert-dismissible " role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                        </button>
+                        <strong>HA OCURRIDO UN PROBLEMA!</strong> La factura no se ha podido generar, vuelve a intentarlo. Si el problema persiste contacta a un administrador.
+                      </div>';
               }
+            }
             ?>
             <div class="col-md-12 ">
               <div class="x_panel">
@@ -187,6 +194,7 @@ $fechaActual = date('d / m / Y');
                   <form class="form-label-left input_mask">
                     <div class="col-md-12 col-sm-12 orm-group has-feedback">
                       <h3>Cliente</h3>
+                      <span>(Presiona la tecla ENTER para confirmar el cliente)</span>
                     </div>
 
                     <div class="col-md-6 col-sm-6  form-group has-feedback">
