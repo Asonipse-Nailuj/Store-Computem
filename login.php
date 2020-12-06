@@ -68,7 +68,8 @@ include_once("conexion.php");
                   $_SESSION['user_type'] = $tipo;
                   $_SESSION['user'] = $usuario;
 
-                  $mensaje = '<div class="alert alert-success alert-dismissible " role="alert">
+                  $mensaje = '<link href="vendors/nprogress/nprogress.css" rel="stylesheet">';
+                  $mensaje .= '<div class="alert alert-success alert-dismissible " role="alert">
                               <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
                               </button>
                               <strong>ACCESO CONCEDIDO!</strong><br>Bienvenido a Store Computem, ' . $nombre . '.
