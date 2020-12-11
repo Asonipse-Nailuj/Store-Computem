@@ -145,7 +145,303 @@ include_once "funciones.php";
       <!-- /top navigation -->
 
       <div class="right_col" role="main">
-        <div class="clearfix"></div>
+        <div class="row" style="display: inline-block;">
+          <div class="tile_count">
+            <?php
+            $registro = $conexion->query("SELECT SUM(total) AS 'total_dia' FROM item_venta WHERE estado = 's' AND fecha = CURDATE()") or die($conexion->error);
+            $dia = $registro->fetchAll(PDO::FETCH_OBJ);
+
+            foreach ($dia as $row) {
+              $ganancia = $row->total_dia;
+            }
+
+            $valor_dia = (empty($ganancia)) ? 0 : $ganancia;
+            ?>
+            <div class="col-sm-6  tile_stats_count">
+              <span class="count_top"><i class="fa fa-dollar"></i> Ganancias del dia</span>
+              <div class="count">$<?php echo $valor_dia; ?></div>
+            </div>
+
+            <?php
+            $registro = $conexion->query("SELECT SUM(cantidad) AS 'cant_dia' FROM item_detalle_venta JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE estado = 's' AND fecha = CURDATE()") or die($conexion->error);
+            $dia = $registro->fetchAll(PDO::FETCH_OBJ);
+
+            foreach ($dia as $row) {
+              $cantidad = $row->cant_dia;
+            }
+
+            $cant_dia = (empty($cantidad)) ? 0 : $cantidad;
+            ?>
+            <div class="col-sm-6  tile_stats_count">
+              <span class="count_top"><i class="fa fa-bar-chart"></i> Cantidad de productos</span>
+              <div class="count"><?php echo $cant_dia; ?></div>
+              <span class="count_bottom"> Ventas del dia</span>
+            </div>
+
+            <?php
+            $registro = $conexion->query("SELECT SUM(total) AS 'total_mes' FROM item_venta WHERE estado = 's' AND MONTH(fecha) = MONTH(NOW())") or die($conexion->error);
+            $mes = $registro->fetchAll(PDO::FETCH_OBJ);
+
+            foreach ($mes as $row) {
+              $ganancia = $row->total_mes;
+            }
+
+            $valor_mes = (empty($ganancia)) ? 0 : $ganancia;
+            ?>
+            <div class="col-sm-6  tile_stats_count">
+              <span class="count_top"><i class="fa fa-dollar"></i> Ganancias del mes</span>
+              <div class="count">$<?php echo $valor_mes; ?></div>
+            </div>
+
+            <?php
+            $registro = $conexion->query("SELECT SUM(cantidad) AS 'cant_mes' FROM item_detalle_venta JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE estado = 's' AND MONTH(fecha) = MONTH(NOW())") or die($conexion->error);
+            $mes = $registro->fetchAll(PDO::FETCH_OBJ);
+
+            foreach ($mes as $row) {
+              $cantidad = $row->cant_mes;
+            }
+
+            $cant_mes = (empty($cantidad)) ? 0 : $cantidad;
+            ?>
+            <div class="col-sm-6  tile_stats_count">
+              <span class="count_top"><i class="fa fa-bar-chart"></i> Cantidad de productos</span>
+              <div class="count"><?php echo $cant_mes; ?></div>
+              <span class="count_bottom"> Ventas del mes</span>
+            </div>
+
+            <?php
+            $registro = $conexion->query("SELECT SUM(total) AS 'total_anio' FROM item_venta WHERE estado = 's' AND YEAR(fecha) = YEAR(NOW())") or die($conexion->error);
+            $dia = $registro->fetchAll(PDO::FETCH_OBJ);
+
+            foreach ($dia as $row) {
+              $ganancia = $row->total_anio;
+            }
+
+            $valor_anio = (empty($ganancia)) ? 0 : $ganancia;
+            ?>
+            <div class="col-sm-6  tile_stats_count">
+              <span class="count_top"><i class="fa fa-dollar"></i> Ganancias del año</span>
+              <div class="count">$<?php echo $valor_anio; ?></div>
+            </div>
+
+            <?php
+            $registro = $conexion->query("SELECT SUM(cantidad) AS 'cant_anio' FROM item_detalle_venta JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE estado = 's' AND YEAR(fecha) = YEAR(NOW())") or die($conexion->error);
+            $anio = $registro->fetchAll(PDO::FETCH_OBJ);
+
+            foreach ($anio as $row) {
+              $cantidad = $row->cant_anio;
+            }
+
+            $cant_anio = (empty($cantidad)) ? 0 : $cantidad;
+            ?>
+            <div class="col-sm-6  tile_stats_count">
+              <span class="count_top"><i class="fa fa-bar-chart"></i> Cantidad de productos</span>
+              <div class="count"><?php echo $cant_anio; ?></div>
+              <span class="count_bottom"> Ventas del año</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 widget widget_tally_box">
+            <div class="x_panel fixed_height_390">
+              <div class="x_title">
+                <h2>Más vendidos del dia</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div style="text-align: center; margin-bottom: 17px">
+                  <ul class="verticle_bars list-inline" style="display: flex;">
+                    <?php
+                    $consulta = $conexion->query("SELECT SUM(cantidad) AS 'cant' FROM item_detalle_venta JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE fecha = CURDATE()") or die($conexion->error);
+
+                    $cantidad = $consulta->fetchAll(PDO::FETCH_OBJ);
+
+                    foreach ($cantidad as $row) {
+                      $cant_total = $row->cant;
+                    }
+
+                    $registro = $conexion->query("SELECT nombre_producto, SUM(item_detalle_venta.cantidad) AS 'cant_venta' FROM item_detalle_venta JOIN inventario ON item_detalle_venta.producto = inventario.id JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE fecha = CURDATE() GROUP BY producto ORDER BY item_detalle_venta.cantidad DESC LIMIT 5") or die($conexion->error);
+
+                    $productos = $registro->fetchAll(PDO::FETCH_OBJ);
+
+                    $color_barra = array("success", "danger", "dark", "info", "gray");
+
+                    $porcentajes = array();
+                    $nombres = array();
+                    $cantidades = array();
+                    foreach ($productos as $row) {
+                      $valor = (100 * $row->cant_venta) / $cant_total;
+
+                      array_push($porcentajes, $valor);
+                      array_push($nombres, $row->nombre_producto);
+                      array_push($cantidades, $row->cant_venta);
+                    }
+
+                    for ($i = 0; $i < count($porcentajes); $i++) {
+                    ?>
+                      <li>
+                        <div class="progress vertical progress_wide bottom">
+                          <div class="progress-bar progress-bar-<?php echo $color_barra[$i]; ?>" role="progressbar" data-transitiongoal="<?php echo $porcentajes[$i]; ?>" aria-valuenow="<?php echo $porcentajes[$i]; ?>" style="height: 100%;"><?php echo $cantidades[$i]; ?></div>
+                        </div>
+                      </li>
+                    <?php
+                    }
+                    ?>
+                  </ul>
+                </div>
+                <div class="divider"></div>
+                <ul class="legend list-unstyled">
+                  <?php
+                  $color_icono = array("green", "red", "dark", "blue", "gray");
+
+                  for ($i = 0; $i < count($nombres); $i++) {
+                  ?>
+                    <li>
+                      <p>
+                        <span class="icon"><i class="fa fa-square <?php echo $color_icono[$i]; ?>"></i></span> <span class="name"><?php echo $nombres[$i]; ?></span>
+                      </p>
+                    </li>
+                  <?php
+                  }
+                  ?>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 widget widget_tally_box">
+            <div class="x_panel fixed_height_390">
+              <div class="x_title">
+                <h2>Más vendidos del mes</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div style="text-align: center; margin-bottom: 17px">
+                  <ul class="verticle_bars list-inline" style="display: flex;">
+                    <?php
+                    $consulta = $conexion->query("SELECT SUM(cantidad) AS 'cant' FROM item_detalle_venta JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE MONTH(fecha) = MONTH(NOW())") or die($conexion->error);
+
+                    $cantidad = $consulta->fetchAll(PDO::FETCH_OBJ);
+
+                    foreach ($cantidad as $row) {
+                      $cant_total = $row->cant;
+                    }
+
+                    $registro = $conexion->query("SELECT nombre_producto, SUM(item_detalle_venta.cantidad) AS 'cant_venta' FROM item_detalle_venta JOIN inventario ON item_detalle_venta.producto = inventario.id JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE MONTH(fecha) = MONTH(NOW()) GROUP BY producto ORDER BY item_detalle_venta.cantidad DESC LIMIT 5") or die($conexion->error);
+
+                    $productos = $registro->fetchAll(PDO::FETCH_OBJ);
+
+                    $color_barra = array("success", "danger", "dark", "info", "gray");
+
+                    $porcentajes = array();
+                    $nombres = array();
+                    $cantidades = array();
+                    foreach ($productos as $row) {
+                      $valor = (100 * $row->cant_venta) / $cant_total;
+
+                      array_push($porcentajes, $valor);
+                      array_push($nombres, $row->nombre_producto);
+                      array_push($cantidades, $row->cant_venta);
+                    }
+
+                    for ($i = 0; $i < count($porcentajes); $i++) {
+                    ?>
+                      <li>
+                        <div class="progress vertical progress_wide bottom">
+                          <div class="progress-bar progress-bar-<?php echo $color_barra[$i]; ?>" role="progressbar" data-transitiongoal="<?php echo $porcentajes[$i]; ?>" aria-valuenow="<?php echo $porcentajes[$i]; ?>" style="height: 100%;"><?php echo $cantidades[$i]; ?></div>
+                        </div>
+                      </li>
+                    <?php
+                    }
+                    ?>
+                  </ul>
+                </div>
+                <div class="divider"></div>
+                <ul class="legend list-unstyled">
+                  <?php
+                  $color_icono = array("green", "red", "dark", "blue", "gray");
+
+                  for ($i = 0; $i < count($nombres); $i++) {
+                  ?>
+                    <li>
+                      <p>
+                        <span class="icon"><i class="fa fa-square <?php echo $color_icono[$i]; ?>"></i></span> <span class="name"><?php echo $nombres[$i]; ?></span>
+                      </p>
+                    </li>
+                  <?php
+                  }
+                  ?>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 widget widget_tally_box">
+            <div class="x_panel fixed_height_390">
+              <div class="x_title">
+                <h2>Más vendidos del año</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div style="text-align: center; margin-bottom: 17px">
+                  <ul class="verticle_bars list-inline" style="display: flex;">
+                    <?php
+                    $consulta = $conexion->query("SELECT SUM(cantidad) AS 'cant' FROM item_detalle_venta JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE YEAR(fecha) = YEAR(NOW())") or die($conexion->error);
+
+                    $cantidad = $consulta->fetchAll(PDO::FETCH_OBJ);
+
+                    foreach ($cantidad as $row) {
+                      $cant_total = $row->cant;
+                    }
+
+                    $registro = $conexion->query("SELECT nombre_producto, SUM(item_detalle_venta.cantidad) AS 'cant_venta' FROM item_detalle_venta JOIN inventario ON item_detalle_venta.producto = inventario.id JOIN item_venta ON item_detalle_venta.factura = item_venta.id WHERE YEAR(fecha) = YEAR(NOW()) GROUP BY producto ORDER BY item_detalle_venta.cantidad DESC LIMIT 5") or die($conexion->error);
+
+                    $productos = $registro->fetchAll(PDO::FETCH_OBJ);
+
+                    $color_barra = array("success", "danger", "dark", "info", "gray");
+
+                    $porcentajes = array();
+                    $nombres = array();
+                    $cantidades = array();
+                    foreach ($productos as $row) {
+                      $valor = (100 * $row->cant_venta) / $cant_total;
+
+                      array_push($porcentajes, $valor);
+                      array_push($nombres, $row->nombre_producto);
+                      array_push($cantidades, $row->cant_venta);
+                    }
+
+                    for ($i = 0; $i < count($porcentajes); $i++) {
+                    ?>
+                      <li>
+                        <div class="progress vertical progress_wide bottom">
+                          <div class="progress-bar progress-bar-<?php echo $color_barra[$i]; ?>" role="progressbar" data-transitiongoal="<?php echo $porcentajes[$i]; ?>" aria-valuenow="<?php echo $porcentajes[$i]; ?>" style="height: 100%;"><?php echo $cantidades[$i]; ?></div>
+                        </div>
+                      </li>
+                    <?php
+                    }
+                    ?>
+                  </ul>
+                </div>
+                <div class="divider"></div>
+                <ul class="legend list-unstyled">
+                  <?php
+                  $color_icono = array("green", "red", "dark", "blue", "gray");
+
+                  for ($i = 0; $i < count($nombres); $i++) {
+                  ?>
+                    <li>
+                      <p>
+                        <span class="icon"><i class="fa fa-square <?php echo $color_icono[$i]; ?>"></i></span> <span class="name"><?php echo $nombres[$i]; ?></span>
+                      </p>
+                    </li>
+                  <?php
+                  }
+                  ?>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- footer content -->
